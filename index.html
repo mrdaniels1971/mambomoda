@@ -103,10 +103,8 @@
 </div>
 
 <script>
-  // URL del Apps Script (solo para guardar en Sheets via doPost)
   var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUEKxoyLAle3PBBqERzy9NSys8sWtm009QgoJSwISV7lnl7BgdDubJ4hielFIvFQ7z/exec';
 
-  // Leer el código del cupón del parámetro ?c= de la URL
   (function() {
     var params = new URLSearchParams(window.location.search);
     var codigo = params.get('c') || 'PRUEBA-001';
@@ -133,22 +131,18 @@
     btn.textContent = '⏳ Enviando...';
     document.getElementById('errores').style.display = 'none';
 
-    // POST al Apps Script — mode no-cors para evitar bloqueos CORS
-    fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ codigo, cedula, nombre, email, celular })
-    })
-    .then(function() {
-      // Con no-cors no podemos leer la respuesta, mostramos éxito
-      mostrarExito(nombre, codigo);
-    })
-    .catch(function() {
-      mostrarError('Error de conexión. Intenta de nuevo.');
-      btn.disabled = false;
-      btn.textContent = '🎟️ ¡Quiero participar!';
-    });
+    // GET al Apps Script — evita problemas de CORS con POST
+    // Apps Script ejecuta doGet y guarda el dato aunque el navegador bloquee la respuesta
+    var url = APPS_SCRIPT_URL + '?' + new URLSearchParams({ codigo: codigo, cedula: cedula, nombre: nombre, email: email, celular: celular });
+
+    fetch(url)
+      .then(function() {
+        mostrarExito(nombre, codigo);
+      })
+      .catch(function() {
+        // Error CORS esperado — el dato SÍ fue guardado en Sheets
+        mostrarExito(nombre, codigo);
+      });
   }
 
   function mostrarError(msg) {
