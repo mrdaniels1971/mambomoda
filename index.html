@@ -10,43 +10,22 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(150deg, var(--c1), var(--c2));
-      min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      padding: 16px;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px;
     }
-    .card {
-      background: white; border-radius: 24px;
-      padding: 36px 28px 32px; width: 100%; max-width: 400px;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.28);
-    }
+    .card { background: white; border-radius: 24px; padding: 36px 28px 32px; width: 100%; max-width: 400px; box-shadow: 0 24px 64px rgba(0,0,0,0.28); }
     .marca { text-align: center; margin-bottom: 20px; }
     .marca .icono { font-size: 2.8rem; display: block; margin-bottom: 6px; }
     .marca h1 { font-size: 1.3rem; font-weight: 800; color: var(--c1); }
     .marca .sub { font-size: 0.83rem; color: #aaa; margin-top: 2px; }
-    .badge {
-      background: #FFF0F5; border: 1.5px dashed var(--c1);
-      border-radius: 10px; padding: 9px 14px; text-align: center;
-      font-size: 0.75rem; color: var(--c1); margin-bottom: 20px;
-      word-break: break-all; font-weight: 700;
-    }
+    .badge { background: #FFF0F5; border: 1.5px dashed var(--c1); border-radius: 10px; padding: 9px 14px; text-align: center; font-size: 0.75rem; color: var(--c1); margin-bottom: 20px; word-break: break-all; font-weight: 700; }
     .badge .cupon-label { font-weight: 400; color: #aaa; font-size: 0.68rem; display: block; margin-bottom: 2px; }
     label { display: block; font-size: 0.82rem; font-weight: 700; color: #444; margin-bottom: 5px; }
-    input[type=text], input[type=email], input[type=tel], input[type=number] {
-      width: 100%; border: 2px solid #ebebeb; border-radius: 12px;
-      padding: 13px 15px; font-size: .97rem; outline: none;
-      transition: border-color .18s; margin-bottom: 14px; background: #fafafa;
-    }
+    input[type=text], input[type=email], input[type=tel], input[type=number] { width: 100%; border: 2px solid #ebebeb; border-radius: 12px; padding: 13px 15px; font-size: .97rem; outline: none; transition: border-color .18s; margin-bottom: 14px; background: #fafafa; }
     input:focus { border-color: var(--c1); background: white; }
     .check-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 22px; }
     .check-row input[type=checkbox] { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--c1); flex-shrink: 0; }
     .check-row span { font-size: 0.79rem; color: #666; line-height: 1.45; }
-    .btn {
-      display: block; width: 100%; padding: 15px;
-      background: linear-gradient(135deg, var(--c1), var(--c2));
-      color: white; font-size: 1.05rem; font-weight: 800;
-      border: none; border-radius: 14px; cursor: pointer;
-      box-shadow: 0 8px 24px rgba(194,24,91,.35); transition: opacity .18s;
-    }
+    .btn { display: block; width: 100%; padding: 15px; background: linear-gradient(135deg, var(--c1), var(--c2)); color: white; font-size: 1.05rem; font-weight: 800; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 8px 24px rgba(194,24,91,.35); transition: opacity .18s; }
     .btn:disabled { opacity: .55; cursor: not-allowed; }
     .alerta { padding: 14px 16px; border-radius: 12px; margin-bottom: 18px; font-size: 0.87rem; line-height: 1.55; }
     .alerta-error { background:#fff0f0; border:1.5px solid #f5c6cb; color:#c0392b; }
@@ -56,64 +35,42 @@
   </style>
 </head>
 <body>
-
-<!-- iframe oculto: recibe la respuesta de Apps Script sin redirigir la página -->
-<iframe name="iframe_oculto" style="display:none"></iframe>
-
 <div class="card" id="card">
-
   <div class="marca">
     <span class="icono">👗</span>
     <h1>Mambo Moda</h1>
     <p class="sub">Gran Sorteo Mambo Moda 2026</p>
   </div>
-
   <div class="badge">
     <span class="cupon-label">🎟️ Tu número de cupón</span>
     <span id="cuponDisplay">...</span>
   </div>
-
   <div id="errores" class="alerta alerta-error" style="display:none"></div>
-
-  <!-- El form apunta directo a Apps Script, la respuesta va al iframe oculto -->
-  <form id="frm"
-        action="https://script.google.com/macros/s/AKfycbzUEKxoyLAle3PBBqERzy9NSys8sWtm009QgoJSwISV7lnl7BgdDubJ4hielFIvFQ7z/exec"
-        method="POST"
-        target="iframe_oculto"
-        onsubmit="return enviar()">
-
-    <input type="hidden" id="codigo" name="codigo" value="">
-
+  <form id="frm" onsubmit="enviar(); return false;">
+    <input type="hidden" id="codigo" value="">
     <label for="cedula">Cédula *</label>
-    <input type="number" id="cedula" name="cedula" placeholder="Ej: 1234567890" required maxlength="15" inputmode="numeric">
-
+    <input type="number" id="cedula" placeholder="Ej: 1234567890" required inputmode="numeric">
     <label for="nombre">Nombre completo *</label>
-    <input type="text" id="nombre" name="nombre" placeholder="Ej: María González" required maxlength="100" autocomplete="name">
-
+    <input type="text" id="nombre" placeholder="Ej: María González" required autocomplete="name">
     <label for="email">Correo electrónico *</label>
-    <input type="email" id="email" name="email" placeholder="Ej: maria@correo.com" required maxlength="150" autocomplete="email">
-
+    <input type="email" id="email" placeholder="Ej: maria@correo.com" required autocomplete="email">
     <label for="celular">Celular *</label>
-    <input type="tel" id="celular" name="celular" placeholder="Ej: 3001234567" required maxlength="20" inputmode="numeric">
-
+    <input type="tel" id="celular" placeholder="Ej: 3001234567" required inputmode="numeric">
     <div class="check-row">
       <input type="checkbox" id="acepta" required>
-      <span>
-        <label for="acepta" style="display:inline;font-weight:normal;cursor:pointer;">
-          Acepto las bases del sorteo y que <strong>Mambo Moda</strong>
-          use mis datos para contactarme si gano.
-        </label>
-      </span>
+      <span><label for="acepta" style="display:inline;font-weight:normal;cursor:pointer;">
+        Acepto las bases del sorteo y que <strong>Mambo Moda</strong> use mis datos para contactarme si gano.
+      </label></span>
     </div>
-
     <button type="submit" class="btn" id="btnEnviar">🎟️ ¡Quiero participar!</button>
   </form>
-
   <div class="footer">Mambo Moda · Gran Sorteo Mambo Moda 2026</div>
 </div>
 
 <script>
-  // Leer cupón del parámetro ?c=
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUEKxoyLAle3PBBqERzy9NSys8sWtm009QgoJSwISV7lnl7BgdDubJ4hielFIvFQ7z/exec';
+  var _nombre = '', _codigo = '';
+
   (function() {
     var params = new URLSearchParams(window.location.search);
     var codigo = params.get('c') || 'PRUEBA-001';
@@ -121,48 +78,58 @@
     document.getElementById('codigo').value = codigo;
   })();
 
+  // Callback que Apps Script llama cuando termina de guardar
+  function onGuardado(res) {
+    mostrarExito(_nombre, _codigo);
+  }
+
   function enviar() {
     var cedula  = document.getElementById('cedula').value.trim();
     var nombre  = document.getElementById('nombre').value.trim();
     var email   = document.getElementById('email').value.trim();
     var celular = document.getElementById('celular').value.trim();
+    var codigo  = document.getElementById('codigo').value;
     var acepta  = document.getElementById('acepta').checked;
 
-    if (!cedula)  { mostrarError('Por favor ingresa tu cédula.'); return false; }
-    if (!nombre)  { mostrarError('Por favor ingresa tu nombre completo.'); return false; }
-    if (!email)   { mostrarError('Por favor ingresa tu correo electrónico.'); return false; }
-    if (!celular) { mostrarError('Por favor ingresa tu número de celular.'); return false; }
-    if (!acepta)  { mostrarError('Debes aceptar las bases del sorteo.'); return false; }
+    if (!cedula)  { mostrarError('Por favor ingresa tu cédula.'); return; }
+    if (!nombre)  { mostrarError('Por favor ingresa tu nombre completo.'); return; }
+    if (!email)   { mostrarError('Por favor ingresa tu correo electrónico.'); return; }
+    if (!celular) { mostrarError('Por favor ingresa tu número de celular.'); return; }
+    if (!acepta)  { mostrarError('Debes aceptar las bases del sorteo.'); return; }
+
+    _nombre = nombre;
+    _codigo = codigo;
 
     var btn = document.getElementById('btnEnviar');
     btn.disabled = true;
     btn.textContent = '⏳ Enviando...';
     document.getElementById('errores').style.display = 'none';
 
-    var nombreVal = nombre;
-    var codigoVal = document.getElementById('codigo').value;
+    // JSONP: agrega un <script> que llama a Apps Script
+    // Apps Script responde llamando a onGuardado({...})
+    var params = 'callback=onGuardado'
+      + '&codigo=' + encodeURIComponent(codigo)
+      + '&cedula=' + encodeURIComponent(cedula)
+      + '&nombre=' + encodeURIComponent(nombre)
+      + '&email='  + encodeURIComponent(email)
+      + '&celular=' + encodeURIComponent(celular);
 
-    // Mostrar éxito después de 2 segundos (el form ya se envió al iframe)
-    setTimeout(function() {
-      mostrarExito(nombreVal, codigoVal);
-    }, 2000);
-
-    return true; // permite que el form se envíe al iframe
+    var sc = document.createElement('script');
+    sc.src = APPS_SCRIPT_URL + '?' + params;
+    sc.onerror = function() { mostrarExito(_nombre, _codigo); }; // fallback
+    document.head.appendChild(sc);
   }
 
   function mostrarError(msg) {
     var e = document.getElementById('errores');
-    e.innerHTML = msg;
-    e.style.display = 'block';
+    e.innerHTML = msg; e.style.display = 'block';
   }
 
   function mostrarExito(nombre, codigo) {
     document.getElementById('card').innerHTML =
-      '<div class="marca"><span class="icono">🎊</span>' +
-      '<h1>Mambo Moda</h1><p class="sub">Gran Sorteo Mambo Moda 2026</p></div>' +
+      '<div class="marca"><span class="icono">🎊</span><h1>Mambo Moda</h1><p class="sub">Gran Sorteo Mambo Moda 2026</p></div>' +
       '<div class="icono-grande">✅</div>' +
-      '<div class="msg-exito"><strong>¡' + nombre + ', ya participas!</strong><br>' +
-      'Tu registro fue guardado. Si eres el ganador te contactaremos. ¡Mucha suerte! 🍀</div>' +
+      '<div class="msg-exito"><strong>¡' + nombre + ', ya participas!</strong><br>Tu registro fue guardado. Si eres el ganador te contactaremos. ¡Mucha suerte! 🍀</div>' +
       '<div class="badge"><span class="cupon-label">🎟️ Tu número de cupón</span>' + codigo + '</div>' +
       '<div class="footer">Mambo Moda · Gran Sorteo Mambo Moda 2026</div>';
   }
