@@ -56,6 +56,10 @@
   </style>
 </head>
 <body>
+
+<!-- iframe oculto: recibe la respuesta de Apps Script sin redirigir la página -->
+<iframe name="iframe_oculto" style="display:none"></iframe>
+
 <div class="card" id="card">
 
   <div class="marca">
@@ -71,20 +75,26 @@
 
   <div id="errores" class="alerta alerta-error" style="display:none"></div>
 
-  <form id="frm" onsubmit="enviar(); return false;">
-    <input type="hidden" id="codigo" value="">
+  <!-- El form apunta directo a Apps Script, la respuesta va al iframe oculto -->
+  <form id="frm"
+        action="https://script.google.com/macros/s/AKfycbzUEKxoyLAle3PBBqERzy9NSys8sWtm009QgoJSwISV7lnl7BgdDubJ4hielFIvFQ7z/exec"
+        method="POST"
+        target="iframe_oculto"
+        onsubmit="return enviar()">
+
+    <input type="hidden" id="codigo" name="codigo" value="">
 
     <label for="cedula">Cédula *</label>
-    <input type="number" id="cedula" placeholder="Ej: 1234567890" required maxlength="15" inputmode="numeric">
+    <input type="number" id="cedula" name="cedula" placeholder="Ej: 1234567890" required maxlength="15" inputmode="numeric">
 
     <label for="nombre">Nombre completo *</label>
-    <input type="text" id="nombre" placeholder="Ej: María González" required maxlength="100" autocomplete="name">
+    <input type="text" id="nombre" name="nombre" placeholder="Ej: María González" required maxlength="100" autocomplete="name">
 
     <label for="email">Correo electrónico *</label>
-    <input type="email" id="email" placeholder="Ej: maria@correo.com" required maxlength="150" autocomplete="email">
+    <input type="email" id="email" name="email" placeholder="Ej: maria@correo.com" required maxlength="150" autocomplete="email">
 
     <label for="celular">Celular *</label>
-    <input type="tel" id="celular" placeholder="Ej: 3001234567" required maxlength="20" inputmode="numeric">
+    <input type="tel" id="celular" name="celular" placeholder="Ej: 3001234567" required maxlength="20" inputmode="numeric">
 
     <div class="check-row">
       <input type="checkbox" id="acepta" required>
@@ -103,8 +113,7 @@
 </div>
 
 <script>
-  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUEKxoyLAle3PBBqERzy9NSys8sWtm009QgoJSwISV7lnl7BgdDubJ4hielFIvFQ7z/exec';
-
+  // Leer cupón del parámetro ?c=
   (function() {
     var params = new URLSearchParams(window.location.search);
     var codigo = params.get('c') || 'PRUEBA-001';
@@ -117,32 +126,28 @@
     var nombre  = document.getElementById('nombre').value.trim();
     var email   = document.getElementById('email').value.trim();
     var celular = document.getElementById('celular').value.trim();
-    var codigo  = document.getElementById('codigo').value;
     var acepta  = document.getElementById('acepta').checked;
 
-    if (!cedula)  { mostrarError('Por favor ingresa tu cédula.'); return; }
-    if (!nombre)  { mostrarError('Por favor ingresa tu nombre completo.'); return; }
-    if (!email)   { mostrarError('Por favor ingresa tu correo electrónico.'); return; }
-    if (!celular) { mostrarError('Por favor ingresa tu número de celular.'); return; }
-    if (!acepta)  { mostrarError('Debes aceptar las bases del sorteo.'); return; }
+    if (!cedula)  { mostrarError('Por favor ingresa tu cédula.'); return false; }
+    if (!nombre)  { mostrarError('Por favor ingresa tu nombre completo.'); return false; }
+    if (!email)   { mostrarError('Por favor ingresa tu correo electrónico.'); return false; }
+    if (!celular) { mostrarError('Por favor ingresa tu número de celular.'); return false; }
+    if (!acepta)  { mostrarError('Debes aceptar las bases del sorteo.'); return false; }
 
     var btn = document.getElementById('btnEnviar');
     btn.disabled = true;
     btn.textContent = '⏳ Enviando...';
     document.getElementById('errores').style.display = 'none';
 
-    // GET al Apps Script — evita problemas de CORS con POST
-    // Apps Script ejecuta doGet y guarda el dato aunque el navegador bloquee la respuesta
-    var url = APPS_SCRIPT_URL + '?' + new URLSearchParams({ codigo: codigo, cedula: cedula, nombre: nombre, email: email, celular: celular });
+    var nombreVal = nombre;
+    var codigoVal = document.getElementById('codigo').value;
 
-    fetch(url)
-      .then(function() {
-        mostrarExito(nombre, codigo);
-      })
-      .catch(function() {
-        // Error CORS esperado — el dato SÍ fue guardado en Sheets
-        mostrarExito(nombre, codigo);
-      });
+    // Mostrar éxito después de 2 segundos (el form ya se envió al iframe)
+    setTimeout(function() {
+      mostrarExito(nombreVal, codigoVal);
+    }, 2000);
+
+    return true; // permite que el form se envíe al iframe
   }
 
   function mostrarError(msg) {
